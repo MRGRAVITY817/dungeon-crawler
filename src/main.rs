@@ -39,6 +39,16 @@ impl State {
 
         spawn_player(&mut ecs, map_builder.player_start);
 
+        // Spawn monsters in each room, skipping the first room
+        map_builder
+            .rooms
+            .iter()
+            .skip(1) // Skip the first room where the player starts
+            .map(|room| room.center())
+            .for_each(|pos| {
+                spawn_monster(&mut ecs, &mut rng, pos);
+            });
+
         resources.insert(map_builder.map);
         resources.insert(Camera::new(map_builder.player_start));
 
@@ -56,6 +66,9 @@ impl GameState for State {
         ctx.cls();
         ctx.set_active_console(1);
         ctx.cls();
+        ctx.set_active_console(2);
+        ctx.cls();
+
         self.resources.insert(ctx.key);
         self.systems.execute(&mut self.ecs, &mut self.resources);
         render_draw_buffer(ctx).expect("Render error");
