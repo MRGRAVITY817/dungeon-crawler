@@ -19,16 +19,35 @@ impl Map {
         }
     }
 
-    pub fn render(&self, ctx: &mut BTerm) {
-        for (i, tile) in self.tiles.iter().enumerate() {
-            let x = (i as i32) % SCREEN_WIDTH;
-            let y = (i as i32) / SCREEN_WIDTH;
-            match tile {
-                TileType::Floor => {
-                    ctx.set(x, y, YELLOW, BLACK, to_cp437('.'));
-                }
-                TileType::Wall => {
-                    ctx.set(x, y, GREEN, BLACK, to_cp437('#'));
+    pub fn render(&self, ctx: &mut BTerm, camera: &Camera) {
+        // Draw the map on the first(base) console layer
+        ctx.set_active_console(1);
+
+        for y in camera.top_y..camera.bottom_y {
+            for x in camera.left_x..camera.right_x {
+                if self.in_bounds(Point::new(x, y)) {
+                    let idx = map_idx(x, y);
+
+                    match self.tiles[idx] {
+                        TileType::Floor => {
+                            ctx.set(
+                                x - camera.left_x,
+                                y - camera.top_y,
+                                WHITE,
+                                BLACK,
+                                to_cp437('.'),
+                            );
+                        }
+                        TileType::Wall => {
+                            ctx.set(
+                                x - camera.left_x,
+                                y - camera.top_y,
+                                WHITE,
+                                BLACK,
+                                to_cp437('#'),
+                            );
+                        }
+                    }
                 }
             }
         }
@@ -55,3 +74,4 @@ impl Map {
 pub fn map_idx(x: i32, y: i32) -> usize {
     ((y * SCREEN_WIDTH) + x) as usize
 }
+
