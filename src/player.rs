@@ -5,10 +5,8 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn new(x: i32, y: i32) -> Self {
-        Self {
-            position: Point::new(x, y),
-        }
+    pub fn new(position: Point) -> Self {
+        Self { position }
     }
 
     pub fn render(&self, ctx: &mut BTerm) {
