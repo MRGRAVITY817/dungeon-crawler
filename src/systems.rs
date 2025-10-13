@@ -1,5 +1,9 @@
-use crate::prelude::*;
+mod player_input;
+
+use crate::{prelude::*, systems::player_input::player_input_system};
 
 pub fn build_scheduler() -> Schedule {
-    Schedule::builder().build()
+    Schedule::builder()
+        .add_system(player_input_system())
+        .build()
 }
