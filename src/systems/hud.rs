@@ -11,7 +11,7 @@ pub fn hud(ecs: &SubWorld) {
         .unwrap();
 
     DrawBatch::new()
-        .target(3)
+        .target(UI_CONSOLE_ID)
         .print_centered(1, "Explore the Dungeon. Cursor keys to move.")
         .bar_horizontal(
             Point::zero(),

@@ -11,6 +11,9 @@ mod prelude {
     pub use legion::systems::CommandBuffer;
     pub use legion::world::SubWorld;
     pub use legion::*;
+    pub const BACKGROUND_CONSOLE_ID: usize = 1;
+    pub const ENTITY_CONSOLE_ID: usize = 2;
+    pub const UI_CONSOLE_ID: usize = 3;
     pub const SCREEN_WIDTH: i32 = 80;
     pub const SCREEN_HEIGHT: i32 = 50;
     pub const DISPLAY_WIDTH: i32 = SCREEN_WIDTH / 2;
@@ -69,12 +72,16 @@ impl State {
 
 impl GameState for State {
     fn tick(&mut self, ctx: &mut BTerm) {
-        for i in 0..=3 {
+        // Clear all consoles
+        for i in [BACKGROUND_CONSOLE_ID, ENTITY_CONSOLE_ID, UI_CONSOLE_ID] {
             ctx.set_active_console(i);
             ctx.cls();
         }
 
+        // Insert the current key and mouse position into resources
         self.resources.insert(ctx.key);
+        ctx.set_active_console(BACKGROUND_CONSOLE_ID);
+        self.resources.insert(Point::from_tuple(ctx.mouse_pos()));
 
         let current_state = *self.resources.get::<TurnState>().unwrap();
         match current_state {
