@@ -31,6 +31,7 @@ pub fn spawn_monster(ecs: &mut World, rng: &mut RandomNumberGenerator, pos: Poin
             glyph,
         },
         MovingRandomly,
+        ChasingPlayer,
         Health {
             current: hp,
             max: hp,
