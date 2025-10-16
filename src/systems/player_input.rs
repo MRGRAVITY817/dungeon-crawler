@@ -20,6 +20,44 @@ pub fn player_input(
             _ => Point::zero(),
         };
 
+        let (player_entity, destination) = players
+            .iter(ecs)
+            .map(|(entity, pos)| (*entity, *pos + delta))
+            .next()
+            .unwrap();
+
+        let mut enemies = <(Entity, &Point)>::query().filter(component::<Enemy>());
+
+        if delta.x != 0 || delta.y != 0 {
+            let mut hit_something = false;
+
+            // Try to attack an enemy at the destination
+            enemies
+                .iter(ecs)
+                .filter(|(_, pos)| **pos == destination)
+                .for_each(|(entity, _)| {
+                    hit_something = true;
+                    commands.push((
+                        (),
+                        WantsToAttack {
+                            attacker: player_entity,
+                            victim: *entity,
+                        },
+                    ));
+                });
+
+            // If no enemy was hit, try to move
+            if !hit_something {
+                commands.push((
+                    (),
+                    WantsToMove {
+                        entity: player_entity,
+                        destination,
+                    },
+                ));
+            }
+        }
+
         players.iter(ecs).for_each(|(entity, pos)| {
             let destination = *pos + delta;
             commands.push((
