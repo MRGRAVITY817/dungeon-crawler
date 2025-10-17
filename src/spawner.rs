@@ -10,8 +10,8 @@ pub fn spawn_player(ecs: &mut World, pos: Point) {
             glyph: to_cp437('@'),
         },
         Health {
-            current: 10,
-            max: 10,
+            current: 100,
+            max: 100,
         },
     ));
 }
@@ -46,4 +46,18 @@ fn goblin() -> (i32, String, FontCharType) {
 
 fn orc() -> (i32, String, FontCharType) {
     (2, "Orc".to_string(), to_cp437('o'))
+}
+
+/// Spawns the Amulet of Yendor at the given position
+pub fn spawn_amulet(ecs: &mut World, pos: Point) {
+    ecs.push((
+        Item,
+        AmuletOfYendor,
+        pos,
+        Render {
+            color: ColorPair::new(WHITE, BLACK),
+            glyph: to_cp437('|'),
+        },
+        Name("Amulet of Yendor".to_string()),
+    ));
 }
