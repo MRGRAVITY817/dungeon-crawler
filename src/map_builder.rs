@@ -1,4 +1,5 @@
 mod automata;
+mod drunkard;
 mod empty;
 mod rooms;
 
@@ -16,7 +17,7 @@ pub struct MapBuilder {
 
 impl MapBuilder {
     pub fn new(rng: &mut RandomNumberGenerator) -> Self {
-        let mut architect = automata::CellularAutomataArchitect {};
+        let mut architect = drunkard::DrunkardArchitect {};
         architect.design(rng)
     }
 
