@@ -1,3 +1,4 @@
+mod automata;
 mod empty;
 mod rooms;
 
@@ -15,8 +16,8 @@ pub struct MapBuilder {
 
 impl MapBuilder {
     pub fn new(rng: &mut RandomNumberGenerator) -> Self {
-        let mut architect = rooms::RoomsArchitect {};
-        architect.new(rng)
+        let mut architect = automata::CellularAutomataArchitect {};
+        architect.design(rng)
     }
 
     fn fill(&mut self, tile: TileType) {
@@ -117,8 +118,35 @@ impl MapBuilder {
             }
         }
     }
+
+    fn spawn_monsters(&self, start: &Point, rng: &mut RandomNumberGenerator) -> Vec<Point> {
+        const NUM_MONSTERS: usize = 50;
+        let mut spawnable_tiles: Vec<Point> = self
+            .map
+            .tiles
+            .iter()
+            .enumerate()
+            .filter(|(idx, t)| {
+                **t == TileType::Floor // Only consider floor tiles
+                    && DistanceAlg::Pythagoras.distance2d(*start, self.map.index_to_point2d(*idx))
+                        > 10.0 // Must be at least 10 tiles away from player start
+            })
+            .map(|(idx, _)| self.map.index_to_point2d(idx))
+            .collect();
+
+        let mut spawns = Vec::new();
+
+        // Randomly select spawn points from the available tiles
+        for _ in 0..NUM_MONSTERS {
+            let target_index = rng.random_slice_index(&spawnable_tiles).unwrap();
+            spawns.push(spawnable_tiles[target_index]);
+            spawnable_tiles.remove(target_index);
+        }
+
+        spawns
+    }
 }
 
 trait MapArchitect {
-    fn new(&mut self, rng: &mut RandomNumberGenerator) -> MapBuilder;
+    fn design(&mut self, rng: &mut RandomNumberGenerator) -> MapBuilder;
 }
