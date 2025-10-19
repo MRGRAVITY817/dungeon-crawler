@@ -14,7 +14,7 @@ use crate::prelude::*;
 ///
 /// In the context of map generation, cellular automata can be used to create organic, cave-like structures
 /// by iteratively applying rules that simulate natural processes such as erosion and growth.
-//// This method is particularly effective for generating maps that require a more natural and less structured appearance,
+/// This method is particularly effective for generating maps that require a more natural and less structured appearance,
 /// such as caves or wilderness areas.
 pub struct CellularAutomataArchitect {}
 
