@@ -14,6 +14,7 @@ impl MapArchitect for DrunkardArchitect {
             monster_spawns: Vec::new(),
             player_start: Point::zero(),
             amulet_start: Point::zero(),
+            theme: Box::new(super::themes::DungeonTheme {}),
         };
 
         // Step 1: Fill the map with walls

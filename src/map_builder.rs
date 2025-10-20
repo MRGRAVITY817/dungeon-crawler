@@ -3,6 +3,7 @@ mod drunkard;
 mod empty;
 mod prefab;
 mod rooms;
+mod themes;
 
 use crate::prelude::*;
 use prefab::apply_prefab;
@@ -15,6 +16,7 @@ pub struct MapBuilder {
     pub monster_spawns: Vec<Point>,
     pub player_start: Point,
     pub amulet_start: Point,
+    pub theme: Box<dyn MapTheme>,
 }
 
 impl MapBuilder {
@@ -28,6 +30,11 @@ impl MapBuilder {
 
         let mut mb = architect.design(rng);
         apply_prefab(&mut mb, rng);
+
+        mb.theme = match rng.range(0, 2) {
+            0 => Box::new(themes::DungeonTheme {}),
+            _ => Box::new(themes::ForestTheme {}),
+        };
 
         mb
     }
@@ -161,4 +168,11 @@ impl MapBuilder {
 
 trait MapArchitect {
     fn design(&mut self, rng: &mut RandomNumberGenerator) -> MapBuilder;
+}
+
+/// A trait for defining different map themes
+/// It should be thread-safe (Sync + Send),
+/// since Legion resources may be accessed from multiple threads
+pub trait MapTheme: Sync + Send {
+    fn tile_to_render(&self, tile: TileType) -> FontCharType;
 }
