@@ -63,3 +63,41 @@ pub fn spawn_amulet(ecs: &mut World, pos: Point) {
         Name("Amulet of Yendor".to_string()),
     ));
 }
+
+/// Spawns a health potion item at the given position
+pub fn spawn_health_potion(ecs: &mut World, pos: Point) {
+    ecs.push((
+        Item,
+        pos,
+        Render {
+            color: ColorPair::new(WHITE, BLACK),
+            glyph: to_cp437('!'),
+        },
+        Name("Health Potion".to_string()),
+        ProvidesHealing { amount: 6 },
+    ));
+}
+
+/// Spawns a scroll of dungeon map at the given position
+pub fn spawn_dungeon_map(ecs: &mut World, pos: Point) {
+    ecs.push((
+        Item,
+        pos,
+        Render {
+            color: ColorPair::new(WHITE, BLACK),
+            glyph: to_cp437('{'),
+        },
+        Name("Scroll of Dungeon Map".to_string()),
+        ProvidesDungeonMap,
+    ));
+}
+
+pub fn spawn_entity(ecs: &mut World, rng: &mut RandomNumberGenerator, pos: Point) {
+    let roll = rng.range(1, 6);
+
+    match roll {
+        1 => spawn_health_potion(ecs, pos),
+        2 => spawn_dungeon_map(ecs, pos),
+        _ => spawn_monster(ecs, rng, pos),
+    }
+}
