@@ -86,3 +86,7 @@ pub struct ProvidesHealing {
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ProvidesDungeonMap;
+
+/// Component that indicates an entity is being carried by another entity
+#[derive(Clone, PartialEq)]
+pub struct Carried(pub Entity);
