@@ -41,6 +41,14 @@ pub fn player_input(
 
                 Point::zero()
             }
+            VirtualKeyCode::Key1 => use_item(0, ecs, commands),
+            VirtualKeyCode::Key2 => use_item(1, ecs, commands),
+            VirtualKeyCode::Key3 => use_item(2, ecs, commands),
+            VirtualKeyCode::Key4 => use_item(3, ecs, commands),
+            VirtualKeyCode::Key5 => use_item(4, ecs, commands),
+            VirtualKeyCode::Key6 => use_item(5, ecs, commands),
+            VirtualKeyCode::Key7 => use_item(6, ecs, commands),
+            VirtualKeyCode::Key8 => use_item(7, ecs, commands),
             _ => Point::zero(),
         };
 
@@ -52,7 +60,6 @@ pub fn player_input(
 
         let mut enemies = <(Entity, &Point)>::query().filter(component::<Enemy>());
 
-        let mut did_something = false;
         if delta.x != 0 || delta.y != 0 {
             let mut hit_something = false;
 
@@ -61,7 +68,6 @@ pub fn player_input(
                 .iter(ecs)
                 .filter(|(_, pos)| **pos == destination)
                 .for_each(|(entity, _)| {
-                    did_something = true;
                     hit_something = true;
                     commands.push((
                         (),
@@ -74,7 +80,6 @@ pub fn player_input(
 
             // If no enemy was hit, try to move
             if !hit_something {
-                did_something = true;
                 commands.push((
                     (),
                     WantsToMove {
@@ -96,17 +101,36 @@ pub fn player_input(
             ));
         });
 
-        if !did_something {
-            // If user did nothing, we can recover some health
-            if let Ok(health) = ecs
-                .entry_mut(player_entity)
-                .unwrap()
-                .get_component_mut::<Health>()
-            {
-                health.current = i32::min(health.max, health.current + 1);
-            }
-        }
-
         *turn_state = TurnState::PlayerTurn;
     }
+}
+
+/// Use an item from the player's inventory by its index.
+fn use_item(inventory_index: usize, ecs: &mut SubWorld, commands: &mut CommandBuffer) -> Point {
+    let player_entity = <(Entity, &Player)>::query()
+        .iter(ecs)
+        .map(|(entity, _)| *entity)
+        .next()
+        .unwrap();
+
+    let item_entity = <(Entity, &Item, &Carried)>::query()
+        .iter(ecs)
+        .filter(|(_, _, carried)| carried.0 == player_entity)
+        .enumerate()
+        .filter(|(idx, _)| *idx == inventory_index)
+        .map(|(_, (item_entity, _, _))| *item_entity)
+        .next();
+
+    if let Some(item_entity) = item_entity {
+        // activate item to show its effect
+        commands.push((
+            (),
+            ActivateItem {
+                used_by: player_entity,
+                item: item_entity,
+            },
+        ));
+    }
+
+    Point::zero()
 }

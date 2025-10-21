@@ -90,3 +90,10 @@ pub struct ProvidesDungeonMap;
 /// Component that indicates an entity is being carried by another entity
 #[derive(Clone, PartialEq)]
 pub struct Carried(pub Entity);
+
+/// Represents the action of activating an item
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ActivateItem {
+    pub used_by: Entity,
+    pub item: Entity,
+}
