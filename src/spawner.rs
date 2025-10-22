@@ -3,7 +3,7 @@ use crate::prelude::*;
 /// Spawns the player entity at the given position
 pub fn spawn_player(ecs: &mut World, pos: Point) {
     ecs.push((
-        Player,
+        Player { map_level: 0 },
         pos,
         Render {
             color: ColorPair::new(WHITE, BLACK),

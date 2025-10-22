@@ -5,7 +5,7 @@ use crate::prelude::*;
 #[read_component(Health)]
 #[read_component(Point)]
 #[read_component(AmuletOfYendor)]
-pub fn end_turn(ecs: &SubWorld, #[resource] turn_state: &mut TurnState) {
+pub fn end_turn(ecs: &SubWorld, #[resource] turn_state: &mut TurnState, #[resource] map: &Map) {
     let mut player_hp = <(&Health, &Point)>::query().filter(component::<Player>());
 
     // Some stages may not have the amulet, but stairs instead
@@ -31,6 +31,12 @@ pub fn end_turn(ecs: &SubWorld, #[resource] turn_state: &mut TurnState) {
         }
         if pos == amulet_pos {
             new_state = TurnState::Victory;
+        }
+
+        // if we find ourselves on an exit tile, go to next level
+        let idx = map.point2d_to_index(*pos);
+        if map.tiles[idx] == TileType::Exit {
+            new_state = TurnState::NextLevel;
         }
     });
 
