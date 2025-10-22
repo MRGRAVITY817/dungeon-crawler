@@ -7,11 +7,15 @@ use crate::prelude::*;
 #[read_component(AmuletOfYendor)]
 pub fn end_turn(ecs: &SubWorld, #[resource] turn_state: &mut TurnState) {
     let mut player_hp = <(&Health, &Point)>::query().filter(component::<Player>());
+
+    // Some stages may not have the amulet, but stairs instead
+    // Provide a default off-map position
+    let amulet_default = Point::new(-1, -1);
     let amulet_pos = <&Point>::query()
         .filter(component::<AmuletOfYendor>())
         .iter(ecs)
         .next()
-        .unwrap();
+        .unwrap_or(&amulet_default);
 
     let current_state = *turn_state;
     let mut new_state = match current_state {
