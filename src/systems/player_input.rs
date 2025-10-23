@@ -7,6 +7,7 @@ use crate::prelude::*;
 #[write_component(Health)]
 #[read_component(Item)]
 #[read_component(Carried)]
+#[write_component(Weapon)]
 pub fn player_input(
     ecs: &mut SubWorld,
     commands: &mut CommandBuffer,
@@ -29,14 +30,26 @@ pub fn player_input(
                     .next()
                     .unwrap();
 
-                let mut items = <(Entity, &Point)>::query().filter(component::<Item>());
+                let mut items = <(Entity, &Item, &Point)>::query();
 
                 items
                     .iter(ecs)
-                    .filter(|(_, item_pos)| **item_pos == player_pos)
-                    .for_each(|(item_entity, _)| {
+                    .filter(|(_, _item, item_pos)| **item_pos == player_pos)
+                    .for_each(|(item_entity, _item, _)| {
                         commands.remove_component::<Point>(*item_entity);
                         commands.add_component(*item_entity, Carried(player_entity));
+
+                        if let Ok(e) = ecs.entry_ref(*item_entity) {
+                            // If the picked up item is a weapon, remove any other carried weapons
+                            if e.get_component::<Weapon>().is_ok() {
+                                <(Entity, &Carried, &Weapon)>::query()
+                                    .iter(ecs)
+                                    .filter(|(_, carried, _)| carried.0 == player_entity)
+                                    .for_each(|(other_weapon, _, _)| {
+                                        commands.remove(*other_weapon);
+                                    });
+                            }
+                        }
                     });
 
                 Point::zero()
